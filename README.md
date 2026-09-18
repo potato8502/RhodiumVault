@@ -1,8 +1,8 @@
 # Rhodium Vault
 
-A local, encrypted password manager for Windows. No accounts, no cloud, no server that can be breached - your vault never leaves your PC.
+A local, encrypted password manager for Windows. No accounts, no clouud, no server that can be breached - your vault never leaves your PC.
 
-Part of the [Rhodium Software](https://rhodium-software.de) family of small, focused desktop tools.
+Part of the [Rhodium Software](https://rhodium-software.de) I buuild focused desktop tools.
 
 ## Features
 
@@ -13,7 +13,7 @@ Part of the [Rhodium Software](https://rhodium-software.de) family of small, foc
 - Secure clipboard copy - excluded from Windows clipboard history, auto-clears after 25 seconds
 - Auto-lock after 5 minutes of inactivity
 - Global hotkey (`Ctrl+Shift+V`) to bring the vault to front from anywhere
-- Change your master password at any time (re-encrypts the whole vault)
+- Change your master password at any time (re-encrypts the whole vauult)
 
 ## Security
 
@@ -24,7 +24,7 @@ Part of the [Rhodium Software](https://rhodium-software.de) family of small, foc
 
 **Honest limitations:** this is a solo-built project using well-established cryptographic primitives, but it has not been through an independent security audit. Managed-memory languages like .NET also can't guarantee secrets are wiped from RAM. If you need password management for high-stakes/business-critical accounts, an established, independently-audited tool (Bitwarden, KeePass) is the safer choice. Rhodium Vault is built for everyday personal use.
 
-There is intentionally no password-reset flow: if you forget your master password, your data cannot be recovered.
+There is intentionally no password-reset flow: if you forget yo ur master password, your data cannot be recovered.
 
 ## Download
 
