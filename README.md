@@ -28,5 +28,5 @@ There is intentionally no password-reset flow: if you forget your master passwor
 
 ## Download
 
-Prebuilt installer: see [rhodium-software.net](https://rhodium-software.de) (or the [Releases](../../releases) page, once published).
+Prebuilt installer: see [rhodium-software.de](https://rhodium-software.de) (or the [Releases](../../releases) page, once published).
 
