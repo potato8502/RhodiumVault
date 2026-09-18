@@ -1,0 +1,18 @@
+# Build output
+bin/
+obj/
+publish/
+installer/*.exe
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+
+# OS junk
+Thumbs.db
+.DS_Store
+
+# Local app data / logs generated at runtime
+*.log

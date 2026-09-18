@@ -1,0 +1,38 @@
+<Window x:Class="RhodiumVault.Views.UnlockWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Rhodium Vault"
+        Width="440" Height="520"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="{StaticResource BgBrush}">
+    <Grid Margin="32">
+        <StackPanel VerticalAlignment="Center">
+            <TextBlock Text="Rhodium Vault" Style="{StaticResource H1}" HorizontalAlignment="Center" Margin="0,0,0,4"/>
+            <TextBlock x:Name="SubtitleText" Text="Enter your master password to unlock." Style="{StaticResource Caption}"
+                       HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,28"/>
+
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock x:Name="CreateNotice" Text="This is your first time here - create a master password. There is no recovery: if you forget it, your data cannot be restored."
+                               Style="{StaticResource Caption}" Foreground="{StaticResource WarningBrush}"
+                               TextWrapping="Wrap" Margin="0,0,0,16" Visibility="Collapsed"/>
+
+                    <TextBlock Text="Master password" Style="{StaticResource Caption}" Margin="0,0,0,4"/>
+                    <PasswordBox x:Name="PasswordBox1" Style="{StaticResource ModernPasswordBox}" Margin="0,0,0,12"
+                                 KeyDown="PasswordBox_KeyDown"/>
+
+                    <TextBlock x:Name="ConfirmLabel" Text="Confirm master password" Style="{StaticResource Caption}" Margin="0,0,0,4" Visibility="Collapsed"/>
+                    <PasswordBox x:Name="PasswordBox2" Style="{StaticResource ModernPasswordBox}" Margin="0,0,0,12"
+                                 Visibility="Collapsed" KeyDown="PasswordBox_KeyDown"/>
+
+                    <TextBlock x:Name="ErrorText" Text="" Style="{StaticResource Caption}" Foreground="{StaticResource DangerBrush}"
+                               TextWrapping="Wrap" Margin="0,0,0,8" Visibility="Collapsed"/>
+
+                    <Button x:Name="ActionButton" Content="Unlock" Style="{StaticResource AccentButton}"
+                            HorizontalAlignment="Stretch" Margin="0,8,0,0" Click="ActionButton_Click"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </Grid>
+</Window>

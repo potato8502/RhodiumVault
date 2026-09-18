@@ -1,0 +1,45 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:po="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
+
+    <Color x:Key="BgColor">#0A1024</Color>
+    <Color x:Key="SidebarColor">#000000</Color>
+    <Color x:Key="SurfaceColor">#10182E</Color>
+    <Color x:Key="Surface2Color">#182544</Color>
+    <Color x:Key="BorderColor">#26365C</Color>
+    <Color x:Key="TextPrimaryColor">#EEF1FB</Color>
+    <Color x:Key="TextSecondaryColor">#8D96AB</Color>
+    <Color x:Key="AccentColor">#2451D6</Color>
+    <Color x:Key="AccentHoverColor">#3E6BEE</Color>
+    <Color x:Key="Accent2Color">#5580F0</Color>
+    <Color x:Key="SuccessColor">#33D6A6</Color>
+    <Color x:Key="WarningColor">#FFB648</Color>
+    <Color x:Key="DangerColor">#FF5C72</Color>
+
+    <SolidColorBrush x:Key="BgBrush" Color="{StaticResource BgColor}"/>
+    <SolidColorBrush x:Key="SidebarBrush" Color="{StaticResource SidebarColor}"/>
+    <SolidColorBrush x:Key="SurfaceBrush" Color="{StaticResource SurfaceColor}"/>
+    <SolidColorBrush x:Key="Surface2Brush" Color="{StaticResource Surface2Color}"/>
+    <SolidColorBrush x:Key="BorderBrush2" Color="{StaticResource BorderColor}"/>
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource TextPrimaryColor}"/>
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource TextSecondaryColor}"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" po:Freeze="False"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="{StaticResource AccentHoverColor}" po:Freeze="False"/>
+    <SolidColorBrush x:Key="Accent2Brush" Color="{StaticResource Accent2Color}" po:Freeze="False"/>
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}"/>
+    <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}"/>
+
+    <LinearGradientBrush x:Key="AccentGradientBrush" StartPoint="0,0" EndPoint="1,1" po:Freeze="False">
+        <GradientStop Color="#3E6BEE" Offset="0"/>
+        <GradientStop Color="#2451D6" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="HeroGlowBrush" StartPoint="0.5,0" EndPoint="0.5,1" po:Freeze="False">
+        <GradientStop Color="#332451D6" Offset="0"/>
+        <GradientStop Color="#00000000" Offset="1"/>
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="GridAccentLineBrush" Color="#142451D6" po:Freeze="False"/>
+
+</ResourceDictionary>
