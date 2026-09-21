@@ -2,7 +2,7 @@
 
 A local, encrypted password manager for Windows. No accounts, no cloud, no server that can be breached - your vault never leaves your PC.
 
-Part of the [Rhodium Software](https://rhodium-software.net) family of small, focused desktop tools.
+Part of the [Rhodium Software](https://rhodium-software.de) family of small, focused desktop tools.
 
 ## Features
 
@@ -29,7 +29,7 @@ There is intentionally no password-reset flow: if you forget your master passwor
 
 ## Download
 
-Prebuilt installer: see [rhodium-software.net](https://rhodium-software.net) (or the [Releases](../../releases) page, once published).
+Prebuilt installer: see [rhodium-software.de](https://rhodium-software.de) (or the [Releases](../../releases) page, once published).
 
 ## Building from source
 
