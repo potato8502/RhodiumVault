@@ -20,6 +20,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock Text="Rhodium Vault" Style="{StaticResource H1}" VerticalAlignment="Center"/>
             <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button Content="Backup" Style="{StaticResource GhostButton}" Margin="0,0,8,0" Click="Backup_Click"/>
                 <Button Content="Change password" Style="{StaticResource GhostButton}" Margin="0,0,8,0" Click="ChangePassword_Click"/>
                 <Button Content="Lock" Style="{StaticResource GhostButton}" Click="Lock_Click"/>
             </StackPanel>

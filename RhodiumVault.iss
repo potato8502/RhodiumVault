@@ -1,7 +1,7 @@
-[Setup]
+﻿[Setup]
 AppId={{42EBBF0C-5DAD-4891-8B35-159FBD854524}
 AppName=Rhodium Vault
-AppVersion=1.2.0
+AppVersion=1.3.0
 AppPublisher=Rhodium Software
 AppPublisherURL=
 DefaultDirName={localappdata}\Programs\Rhodium Vault

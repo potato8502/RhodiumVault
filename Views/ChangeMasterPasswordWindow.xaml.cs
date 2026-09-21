@@ -43,15 +43,32 @@ public partial class ChangeMasterPasswordWindow : Window
 
         // Re-verify the current password before allowing a change, so an unattended
         // unlocked session can't be used to lock the real owner out.
-        if (_vault.Unlock(current) == null)
+        try
         {
-            ShowError("Current master password is wrong.");
+            if (_vault.Unlock(current) == null)
+            {
+                ShowError("Current master password is wrong.");
+                return;
+            }
+
+            _vault.ChangeMasterPassword(_entries, newPw);
+        }
+        catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException or System.IO.InvalidDataException)
+        {
+            ShowError("The password could not be changed: " + ex.Message + " Your vault on disk is unchanged.");
             return;
         }
 
-        _vault.ChangeMasterPassword(_entries, newPw);
         DialogResult = true;
         Close();
+    }
+
+    private void NewBox_Changed(object sender, RoutedEventArgs e)
+    {
+        var (label, brushKey) = PasswordStrength.Describe(NewBox.Password);
+        StrengthText.Text = label;
+        StrengthText.Foreground = (System.Windows.Media.Brush)FindResource(brushKey);
+        StrengthText.Visibility = NewBox.Password.Length == 0 ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void ShowError(string message)

@@ -19,8 +19,9 @@
                                TextWrapping="Wrap" Margin="0,0,0,16" Visibility="Collapsed"/>
 
                     <TextBlock Text="Master password" Style="{StaticResource Caption}" Margin="0,0,0,4"/>
-                    <PasswordBox x:Name="PasswordBox1" Style="{StaticResource ModernPasswordBox}" Margin="0,0,0,12"
-                                 KeyDown="PasswordBox_KeyDown"/>
+                    <PasswordBox x:Name="PasswordBox1" Style="{StaticResource ModernPasswordBox}" Margin="0,0,0,4"
+                                 KeyDown="PasswordBox_KeyDown" PasswordChanged="PasswordBox1_Changed"/>
+                    <TextBlock x:Name="StrengthText" Text="" Style="{StaticResource Caption}" Margin="0,0,0,12" Visibility="Collapsed"/>
 
                     <TextBlock x:Name="ConfirmLabel" Text="Confirm master password" Style="{StaticResource Caption}" Margin="0,0,0,4" Visibility="Collapsed"/>
                     <PasswordBox x:Name="PasswordBox2" Style="{StaticResource ModernPasswordBox}" Margin="0,0,0,12"

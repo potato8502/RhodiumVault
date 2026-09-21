@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using RhodiumVault.Services;
@@ -60,12 +61,38 @@ public partial class UnlockWindow : Window
                 return;
             }
 
-            _vault.CreateNew(password);
+            try
+            {
+                _vault.CreateNew(password);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                ShowError("Could not create the vault file: " + ex.Message);
+                return;
+            }
             OpenMain(new List<Models.VaultEntry>());
             return;
         }
 
-        var entries = _vault.Unlock(password);
+        List<Models.VaultEntry>? entries;
+        var previousCursor = Mouse.OverrideCursor;
+        Mouse.OverrideCursor = Cursors.Wait;
+        try
+        {
+            entries = _vault.Unlock(password);
+        }
+        catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException or System.Text.Json.JsonException)
+        {
+            ShowError("The vault file could not be read (" + ex.Message + "). "
+                + "Your data was not changed. If this keeps happening, restore vault.dat.bak from "
+                + System.IO.Path.GetDirectoryName(VaultService.DefaultPath) + ".");
+            return;
+        }
+        finally
+        {
+            Mouse.OverrideCursor = previousCursor;
+        }
+
         if (entries == null)
         {
             ShowError("Wrong master password.");
@@ -74,7 +101,20 @@ public partial class UnlockWindow : Window
             return;
         }
 
+        if (_vault.RecoveredFromBackup)
+            MessageBox.Show(this, "vault.dat was damaged, so your last backup (vault.dat.bak) was restored. Your most recent change may be missing.",
+                "Rhodium Vault", MessageBoxButton.OK, MessageBoxImage.Warning);
+
         OpenMain(entries);
+    }
+
+    private void PasswordBox1_Changed(object sender, RoutedEventArgs e)
+    {
+        if (!_isFirstRun) return;
+        var (label, color) = PasswordStrength.Describe(PasswordBox1.Password);
+        StrengthText.Text = label;
+        StrengthText.Foreground = (System.Windows.Media.Brush)FindResource(color);
+        StrengthText.Visibility = PasswordBox1.Password.Length == 0 ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void ShowError(string message)

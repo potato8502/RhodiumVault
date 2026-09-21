@@ -18,11 +18,31 @@ public partial class EntryEditWindow : Window
 
         TitleBox.Text = entry.Title;
         UsernameBox.Text = entry.Username;
-        PasswordBox.Text = entry.Password;
+        PasswordMasked.Password = entry.Password; // shown masked - opening an entry never displays the password
         UrlBox.Text = entry.Url;
         NotesBox.Text = entry.Notes;
 
         Loaded += (s, e) => TitleBox.Focus();
+    }
+
+    private string CurrentPassword => RevealToggle.IsChecked == true ? PasswordPlain.Text : PasswordMasked.Password;
+
+    private void RevealToggle_Changed(object sender, RoutedEventArgs e)
+    {
+        if (RevealToggle.IsChecked == true)
+        {
+            PasswordPlain.Text = PasswordMasked.Password;
+            PasswordMasked.Visibility = Visibility.Collapsed;
+            PasswordPlain.Visibility = Visibility.Visible;
+            RevealToggle.Content = "Hide";
+        }
+        else
+        {
+            PasswordMasked.Password = PasswordPlain.Text;
+            PasswordPlain.Visibility = Visibility.Collapsed;
+            PasswordMasked.Visibility = Visibility.Visible;
+            RevealToggle.Content = "Show";
+        }
     }
 
     private void LengthSlider_Changed(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -32,12 +52,17 @@ public partial class EntryEditWindow : Window
 
     private void Generate_Click(object sender, RoutedEventArgs e)
     {
-        PasswordBox.Text = PasswordGeneratorService.Generate(
+        var generated = PasswordGeneratorService.Generate(
             (int)LengthSlider.Value,
             UpperCheck.IsChecked == true,
             LowerCheck.IsChecked == true,
             DigitsCheck.IsChecked == true,
             SymbolsCheck.IsChecked == true);
+
+        // Show the freshly generated password so the user can see what was created.
+        PasswordMasked.Password = generated;
+        PasswordPlain.Text = generated;
+        RevealToggle.IsChecked = true;
     }
 
     private void Save_Click(object sender, RoutedEventArgs e)
@@ -48,11 +73,12 @@ public partial class EntryEditWindow : Window
             return;
         }
 
+        var password = CurrentPassword;
         _entry.Title = TitleBox.Text.Trim();
         _entry.Username = UsernameBox.Text.Trim();
-        if (_entry.Password != PasswordBox.Text)
+        if (_entry.Password != password)
         {
-            _entry.Password = PasswordBox.Text;
+            _entry.Password = password;
             _entry.PasswordChangedAt = DateTime.UtcNow;
         }
         _entry.Url = UrlBox.Text.Trim();

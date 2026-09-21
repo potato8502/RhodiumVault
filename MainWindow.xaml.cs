@@ -1,3 +1,4 @@
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -24,29 +25,71 @@ public partial class MainWindow : Window
         _entries = entries;
 
         _autoLockTimer = new DispatcherTimer { Interval = TimeSpan.FromMinutes(AutoLockMinutes) };
-        _autoLockTimer.Tick += (s, e) => LockNow();
+        _autoLockTimer.Tick += (s, e) =>
+        {
+            // Don't lock while the user is busy in an Add/Edit/Change-password dialog.
+            if (OwnedWindows.Count > 0) { ResetAutoLock(); return; }
+            LockNow(showUnlock: IsVisible);
+        };
         _autoLockTimer.Start();
+
+        // Any mouse/keyboard input anywhere in the app (including dialogs) counts as activity.
+        InputManager.Current.PreProcessInput += OnAppInput;
+        Closed += (s, e) => InputManager.Current.PreProcessInput -= OnAppInput;
 
         Closing += (s, e) =>
         {
             if (App.IsExiting || _isClosingIntentionally) return;
-            // Closing the window (the X button) just hides it to the tray - the vault stays
-            // unlocked in memory so the global hotkey can bring it straight back without
-            // re-entering the master password. Use "Lock" to actually clear the session.
+            // Closing the window with X locks the vault and leaves the app in the tray.
+            // The hotkey / tray icon brings up the unlock screen again.
             e.Cancel = true;
-            Hide();
+            LockNow(showUnlock: false);
         };
 
         Render();
     }
 
     /// <summary>Called from the tray menu's "Lock" item.</summary>
-    public void TriggerLock() => LockNow();
+    public void TriggerLock(bool showUnlock = true) => LockNow(showUnlock);
 
-    private void Window_Activity(object sender, InputEventArgs e)
+    /// <summary>Wipes the in-memory session before the app exits.</summary>
+    public void PrepareExit()
+    {
+        _autoLockTimer.Stop();
+        _vault.Lock();
+        _entries.Clear();
+    }
+
+    private void OnAppInput(object sender, PreProcessInputEventArgs e)
+    {
+        if (e.StagingItem.Input is MouseButtonEventArgs or KeyEventArgs)
+            ResetAutoLock();
+    }
+
+    private void ResetAutoLock()
     {
         _autoLockTimer.Stop();
         _autoLockTimer.Start();
+    }
+
+    private void Window_Activity(object sender, InputEventArgs e) => ResetAutoLock();
+
+    /// <summary>Saves the vault; on failure the user is told instead of the app crashing.</summary>
+    private bool TrySave()
+    {
+        try
+        {
+            _vault.Save(_entries);
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            MessageBox.Show(this,
+                "Your change could not be saved: " + ex.Message + "\n\nThe previous version of your vault on disk is unchanged. "
+                + "Check that no other program (antivirus, sync tool) is locking the file and that the disk isn't full, then try again.",
+                "Rhodium Vault", MessageBoxButton.OK, MessageBoxImage.Error);
+            return false;
+        }
     }
 
     private void Render()
@@ -108,7 +151,7 @@ public partial class MainWindow : Window
         favoriteBtn.Click += (s, e) =>
         {
             entry.IsFavorite = !entry.IsFavorite;
-            _vault.Save(_entries);
+            if (!TrySave()) entry.IsFavorite = !entry.IsFavorite;
             Render();
         };
         titleRow.Children.Add(favoriteBtn);
@@ -171,13 +214,27 @@ public partial class MainWindow : Window
         return card;
     }
 
+    private static VaultEntry Snapshot(VaultEntry e) => new()
+    {
+        Id = e.Id, Title = e.Title, Username = e.Username, Password = e.Password, Url = e.Url, Notes = e.Notes,
+        CreatedAt = e.CreatedAt, ModifiedAt = e.ModifiedAt, PasswordChangedAt = e.PasswordChangedAt, IsFavorite = e.IsFavorite
+    };
+
+    private static void Restore(VaultEntry target, VaultEntry from)
+    {
+        target.Title = from.Title; target.Username = from.Username; target.Password = from.Password;
+        target.Url = from.Url; target.Notes = from.Notes; target.ModifiedAt = from.ModifiedAt;
+        target.PasswordChangedAt = from.PasswordChangedAt; target.IsFavorite = from.IsFavorite;
+    }
+
     private void EditEntry(VaultEntry entry)
     {
+        var before = Snapshot(entry);
         var editor = new EntryEditWindow(entry) { Owner = this };
         if (editor.ShowDialog() == true)
         {
             entry.ModifiedAt = DateTime.UtcNow;
-            _vault.Save(_entries);
+            if (!TrySave()) Restore(entry, before); // keep memory in sync with what is really on disk
             Render();
         }
     }
@@ -188,8 +245,9 @@ public partial class MainWindow : Window
             MessageBoxButton.YesNo, MessageBoxImage.Warning);
         if (result != MessageBoxResult.Yes) return;
 
+        var index = _entries.IndexOf(entry);
         _entries.Remove(entry);
-        _vault.Save(_entries);
+        if (!TrySave()) _entries.Insert(Math.Min(index, _entries.Count), entry);
         Render();
     }
 
@@ -200,7 +258,7 @@ public partial class MainWindow : Window
         if (editor.ShowDialog() == true)
         {
             _entries.Add(newEntry);
-            _vault.Save(_entries);
+            if (!TrySave()) _entries.Remove(newEntry);
             Render();
         }
     }
@@ -216,14 +274,40 @@ public partial class MainWindow : Window
         }
     }
 
-    private void Lock_Click(object sender, RoutedEventArgs e) => LockNow();
+    private void Backup_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new Microsoft.Win32.SaveFileDialog
+        {
+            Title = "Save an encrypted backup of your vault",
+            FileName = $"RhodiumVault-backup-{DateTime.Now:yyyyMMdd}.dat",
+            Filter = "Rhodium Vault backup (*.dat)|*.dat|All files (*.*)|*.*"
+        };
+        if (dialog.ShowDialog(this) != true) return;
 
-    private void LockNow()
+        try
+        {
+            // vault.dat is always encrypted, so copying it never exposes your passwords.
+            File.Copy(_vault.FilePath, dialog.FileName, overwrite: true);
+            MessageBox.Show(this,
+                "Backup saved. It is encrypted with your current master password - keep that password safe, the backup is useless without it.",
+                "Rhodium Vault", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            MessageBox.Show(this, "The backup could not be saved: " + ex.Message, "Rhodium Vault", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void Lock_Click(object sender, RoutedEventArgs e) => LockNow(showUnlock: true);
+
+    private void LockNow(bool showUnlock)
     {
         _autoLockTimer.Stop();
+        ClipboardService.ClearIfStillOurs();
         _vault.Lock();
+        _entries.Clear(); // drop decrypted entries; the window itself is discarded next
         _isClosingIntentionally = true;
-        App.ShowUnlock();
+        App.ShowUnlock(showUnlock);
         Close();
     }
 }

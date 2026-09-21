@@ -21,9 +21,15 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="8"/>
                 <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <TextBox x:Name="PasswordBox" Style="{StaticResource ModernTextBox}"/>
-            <Button Grid.Column="2" Content="Generate" Style="{StaticResource GhostButton}" Click="Generate_Click"/>
+            <PasswordBox x:Name="PasswordMasked" Style="{StaticResource ModernPasswordBox}"/>
+            <TextBox x:Name="PasswordPlain" Style="{StaticResource ModernTextBox}" Visibility="Collapsed"/>
+            <ToggleButton x:Name="RevealToggle" Grid.Column="2" Content="Show" Padding="14,0" MinWidth="58"
+                          Foreground="{StaticResource TextPrimaryBrush}" Background="{StaticResource Surface2Brush}"
+                          BorderBrush="{StaticResource BorderBrush2}" Checked="RevealToggle_Changed" Unchecked="RevealToggle_Changed"/>
+            <Button Grid.Column="4" Content="Generate" Style="{StaticResource GhostButton}" Click="Generate_Click"/>
         </Grid>
 
         <Grid Margin="0,0,0,12">

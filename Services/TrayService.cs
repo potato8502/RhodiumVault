@@ -55,7 +55,26 @@ public class TrayService : IDisposable
             g.FillEllipse(bgBrush, 14, 19, 4, 4);
             g.FillRectangle(bgBrush, 15, 22, 2, 4);
         }
-        return Icon.FromHandle(bmp.GetHicon());
+        var hIcon = bmp.GetHicon();
+        try
+        {
+            using var temp = Icon.FromHandle(hIcon);
+            return (Icon)temp.Clone(); // the clone owns its own copy, so the native handle can be freed
+        }
+        finally
+        {
+            DestroyIcon(hIcon);
+        }
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool DestroyIcon(IntPtr handle);
+
+    public void ShowNotification(string title, string text)
+    {
+        _icon.BalloonTipTitle = title;
+        _icon.BalloonTipText = text;
+        _icon.ShowBalloonTip(5000);
     }
 
     public void Dispose()
